@@ -20,10 +20,10 @@ Your code says `streaming: true`. Runtime shows 0% actual streams. That's driftâ
 
 ## Installation
 
-1. Install from VS Code Marketplace: Search "PeakInfer"
-2. Or install from VSIX:
+1. Install from VS Code Marketplace: Search "PeakInfer" or [install directly](https://marketplace.visualstudio.com/items?itemName=kalmantic.peakinfer)
+2. Or via command line:
    ```bash
-   code --install-extension peakinfer-1.0.0.vsix
+   code --install-extension kalmantic.peakinfer
    ```
 
 ## Setup
