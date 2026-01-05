@@ -17,19 +17,27 @@ let analysisRunner: AnalysisRunner;
 export function activate(context: vscode.ExtensionContext) {
   console.log('PeakInfer extension activated');
 
-  // Initialize diagnostics collection
-  const diagnosticCollection = vscode.languages.createDiagnosticCollection('peakinfer');
-  context.subscriptions.push(diagnosticCollection);
+  try {
+    // Initialize diagnostics collection
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection('peakinfer');
+    context.subscriptions.push(diagnosticCollection);
 
-  // Initialize managers
-  diagnosticsManager = new DiagnosticsManager(diagnosticCollection);
-  analysisRunner = new AnalysisRunner(context);
+    // Initialize managers
+    diagnosticsManager = new DiagnosticsManager(diagnosticCollection);
+    analysisRunner = new AnalysisRunner(context);
 
-  // Register commands
-  registerCommands(context, diagnosticsManager, analysisRunner);
+    // Register commands
+    registerCommands(context, diagnosticsManager, analysisRunner);
 
-  // Register results panel
-  ResultsPanel.register(context);
+    // Register results panel
+    ResultsPanel.register(context);
+  } catch (error) {
+    console.error('Error activating PeakInfer extension:', error);
+    vscode.window.showErrorMessage(
+      `PeakInfer extension failed to activate: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return;
+  }
 
   // Set up file save listener for analyze-on-save
   const saveDisposable = vscode.workspace.onDidSaveTextDocument(async (document) => {

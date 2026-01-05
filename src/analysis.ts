@@ -108,7 +108,7 @@ export class AnalysisRunner {
 
     // Get model from configuration (supports latest alias or specific version)
     const config = vscode.workspace.getConfiguration('peakinfer');
-    const model = config.get<string>('model') || 'claude-sonnet-4-latest';
+    const model = config.get<string>('model') || 'claude-sonnet-4-20250514';
 
     const response = await client.messages.create({
       model,
