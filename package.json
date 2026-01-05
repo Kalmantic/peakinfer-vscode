@@ -30,6 +30,7 @@
     "url": "https://github.com/Kalmantic/peakinfer-vscode"
   },
   "activationEvents": [
+    "onStartupFinished",
     "onLanguage:typescript",
     "onLanguage:javascript",
     "onLanguage:python",
@@ -86,8 +87,8 @@
         },
         "peakinfer.model": {
           "type": "string",
-          "default": "claude-sonnet-4-latest",
-          "description": "Claude model to use for analysis. Use 'claude-sonnet-4-latest' for latest Sonnet or specify a specific version."
+          "default": "claude-sonnet-4-20250514",
+          "description": "Claude model to use for analysis (e.g., claude-sonnet-4-20250514, claude-3-5-sonnet-20241022)"
         },
         "peakinfer.includeBenchmarks": {
           "type": "boolean",
@@ -151,8 +152,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "node esbuild.js --production",
+    "compile:dev": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
     "pretest": "npm run compile",
     "test": "node ./dist/test/runTest.js",
     "package": "vsce package",
@@ -162,6 +164,7 @@
     "@types/node": "^20.10.0",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.20.0",
     "typescript": "^5.3.0"
   },
   "dependencies": {
