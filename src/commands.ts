@@ -58,6 +58,7 @@ export function registerCommands(
   context.subscriptions.push(
     vscode.commands.registerCommand('peakinfer.clearDiagnostics', () => {
       diagnosticsManager.clear();
+      ResultsPanel.clearResults();
       vscode.window.showInformationMessage('PeakInfer diagnostics cleared');
     })
   );
