@@ -84,6 +84,18 @@ export class ResultsPanel {
     }
   }
 
+  /**
+   * Clear all results from the panel
+   */
+  static clearResults(): void {
+    ResultsPanel.results = [];
+    ResultsPanel.errorMessage = null;
+    ResultsPanel.isLoading = false;
+    if (ResultsPanel.currentPanel) {
+      ResultsPanel.currentPanel.updateContent();
+    }
+  }
+
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this.panel = panel;
 
