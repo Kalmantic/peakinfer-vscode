@@ -63,32 +63,29 @@ export function registerCommands(
     })
   );
 
-  // Set API Key
+  // Set PeakInfer Token
   context.subscriptions.push(
-    vscode.commands.registerCommand('peakinfer.setApiKey', async () => {
-      const apiKey = await vscode.window.showInputBox({
-        prompt: 'Enter your Anthropic API key',
+    vscode.commands.registerCommand('peakinfer.setToken', async () => {
+      const token = await vscode.window.showInputBox({
+        prompt: 'Enter your PeakInfer token (get one at https://peakinfer.com/dashboard)',
         password: true,
-        placeHolder: 'sk-ant-...',
+        placeHolder: 'pk_...',
         validateInput: (value) => {
           if (!value || value.trim().length === 0) {
-            return 'API key cannot be empty';
-          }
-          if (!value.startsWith('sk-')) {
-            return 'Invalid API key format. Should start with "sk-"';
+            return 'Token cannot be empty';
           }
           return null;
         },
       });
 
-      if (apiKey) {
+      if (token) {
         const config = vscode.workspace.getConfiguration('peakinfer');
         await config.update(
-          'anthropicApiKey',
-          apiKey,
+          'token',
+          token,
           vscode.ConfigurationTarget.Global
         );
-        vscode.window.showInformationMessage('Anthropic API key saved');
+        vscode.window.showInformationMessage('PeakInfer token saved');
       }
     })
   );
@@ -149,15 +146,15 @@ export async function analyzeFile(
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';
 
-        if (errorMessage.includes('API key')) {
+        if (errorMessage.includes('token') || errorMessage.includes('Token')) {
           vscode.window
             .showErrorMessage(
               `PeakInfer: ${errorMessage}`,
-              'Set API Key'
+              'Set Token'
             )
             .then((action) => {
-              if (action === 'Set API Key') {
-                vscode.commands.executeCommand('peakinfer.setApiKey');
+              if (action === 'Set Token') {
+                vscode.commands.executeCommand('peakinfer.setToken');
               }
             });
         } else {
@@ -233,15 +230,15 @@ export async function analyzeWorkspace(
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';
 
-        if (errorMessage.includes('API key')) {
+        if (errorMessage.includes('token') || errorMessage.includes('Token')) {
           vscode.window
             .showErrorMessage(
               `PeakInfer: ${errorMessage}`,
-              'Set API Key'
+              'Set Token'
             )
             .then((action) => {
-              if (action === 'Set API Key') {
-                vscode.commands.executeCommand('peakinfer.setApiKey');
+              if (action === 'Set Token') {
+                vscode.commands.executeCommand('peakinfer.setToken');
               }
             });
         } else {

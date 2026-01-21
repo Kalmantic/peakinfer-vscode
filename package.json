@@ -57,8 +57,8 @@
         "title": "PeakInfer: Clear Diagnostics"
       },
       {
-        "command": "peakinfer.setApiKey",
-        "title": "PeakInfer: Set Anthropic API Key"
+        "command": "peakinfer.setToken",
+        "title": "PeakInfer: Set PeakInfer Token"
       }
     ],
     "configuration": {
@@ -69,10 +69,10 @@
           "default": false,
           "description": "Run analysis automatically when files are saved"
         },
-        "peakinfer.anthropicApiKey": {
+        "peakinfer.token": {
           "type": "string",
           "default": "",
-          "description": "Your Anthropic API key (BYOK mode). Leave empty to use ANTHROPIC_API_KEY env var."
+          "description": "Your PeakInfer API token. Get one at https://peakinfer.com/dashboard. Leave empty to use PEAKINFER_TOKEN env var."
         },
         "peakinfer.showInlineHints": {
           "type": "boolean",
@@ -84,11 +84,6 @@
           "default": "warning",
           "enum": ["error", "warning", "info"],
           "description": "Minimum severity level to show in diagnostics"
-        },
-        "peakinfer.model": {
-          "type": "string",
-          "default": "claude-sonnet-4-20250514",
-          "description": "Claude model to use for analysis (e.g., claude-sonnet-4-20250514, claude-3-5-sonnet-20241022)"
         },
         "peakinfer.includeBenchmarks": {
           "type": "boolean",
@@ -167,7 +162,5 @@
     "esbuild": "^0.20.0",
     "typescript": "^5.3.0"
   },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.0"
-  }
+  "dependencies": {}
 }
