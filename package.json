@@ -39,26 +39,71 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "peakinfer",
+          "title": "PeakInfer",
+          "icon": "images/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "peakinfer": [
+        {
+          "id": "peakinfer.quickStart",
+          "name": "Quick Start",
+          "type": "webview"
+        },
+        {
+          "id": "peakinfer.issues",
+          "name": "Issues",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "peakinfer.quickStart",
+        "contents": "Welcome to PeakInfer!\n\nAnalyze your LLM inference code for cost waste, latency issues, and reliability gaps.\n\n[Analyze Current File](command:peakinfer.analyzeFile)\n\n[Analyze Workspace](command:peakinfer.analyzeWorkspace)\n\n[Set Token](command:peakinfer.setToken)\n\nTip: Press ⌘+⌥+P (Mac) or Ctrl+Alt+P to quickly analyze the current file."
+      }
+    ],
     "commands": [
       {
         "command": "peakinfer.analyzeFile",
-        "title": "PeakInfer: Analyze Current File"
+        "title": "Analyze Current File",
+        "category": "PeakInfer",
+        "icon": "$(search)"
       },
       {
         "command": "peakinfer.analyzeWorkspace",
-        "title": "PeakInfer: Analyze Workspace"
+        "title": "Analyze Workspace",
+        "category": "PeakInfer",
+        "icon": "$(folder-opened)"
       },
       {
         "command": "peakinfer.showResults",
-        "title": "PeakInfer: Show Results Panel"
+        "title": "Show Results Panel",
+        "category": "PeakInfer",
+        "icon": "$(output)"
       },
       {
         "command": "peakinfer.clearDiagnostics",
-        "title": "PeakInfer: Clear Diagnostics"
+        "title": "Clear Diagnostics",
+        "category": "PeakInfer",
+        "icon": "$(clear-all)"
       },
       {
         "command": "peakinfer.setToken",
-        "title": "PeakInfer: Set PeakInfer Token"
+        "title": "Set PeakInfer Token",
+        "category": "PeakInfer",
+        "icon": "$(key)"
+      },
+      {
+        "command": "peakinfer.openWalkthrough",
+        "title": "Getting Started",
+        "category": "PeakInfer",
+        "icon": "$(book)"
       }
     ],
     "configuration": {
@@ -116,13 +161,80 @@
           "when": "explorerResourceIsFolder",
           "group": "peakinfer"
         }
+      ],
+      "view/title": [
+        {
+          "command": "peakinfer.analyzeFile",
+          "when": "view == peakinfer.quickStart",
+          "group": "navigation"
+        },
+        {
+          "command": "peakinfer.analyzeWorkspace",
+          "when": "view == peakinfer.quickStart",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "peakinfer.analyzeFile",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "peakinfer.analyzeWorkspace",
+          "when": "workspaceFolderCount > 0"
+        }
       ]
     },
+    "walkthroughs": [
+      {
+        "id": "peakinfer.gettingStarted",
+        "title": "Get Started with PeakInfer",
+        "description": "Learn how to analyze your LLM code for cost, latency, and reliability issues",
+        "steps": [
+          {
+            "id": "peakinfer.setToken",
+            "title": "Set Up Your Token",
+            "description": "Get your free token from peakinfer.com to start analyzing\n\n[Set Token](command:peakinfer.setToken)",
+            "media": {
+              "markdown": "images/walkthrough/token.md"
+            },
+            "completionEvents": ["onSettingChanged:peakinfer.token"]
+          },
+          {
+            "id": "peakinfer.analyzeFirst",
+            "title": "Analyze Your First File",
+            "description": "Open a file with LLM inference code and press **⌘+⌥+P** (Mac) or **Ctrl+Alt+P** (Windows/Linux)\n\n[Analyze Current File](command:peakinfer.analyzeFile)",
+            "media": {
+              "markdown": "images/walkthrough/analyze.md"
+            },
+            "completionEvents": ["onCommand:peakinfer.analyzeFile"]
+          },
+          {
+            "id": "peakinfer.viewResults",
+            "title": "View Your Results",
+            "description": "See detailed analysis with cost estimates, latency insights, and optimization suggestions\n\n[Show Results](command:peakinfer.showResults)",
+            "media": {
+              "markdown": "images/walkthrough/results.md"
+            },
+            "completionEvents": ["onCommand:peakinfer.showResults"]
+          },
+          {
+            "id": "peakinfer.workspace",
+            "title": "Analyze Entire Workspace",
+            "description": "Scan your whole project for LLM inference issues\n\n[Analyze Workspace](command:peakinfer.analyzeWorkspace)",
+            "media": {
+              "markdown": "images/walkthrough/workspace.md"
+            },
+            "completionEvents": ["onCommand:peakinfer.analyzeWorkspace"]
+          }
+        ]
+      }
+    ],
     "keybindings": [
       {
         "command": "peakinfer.analyzeFile",
-        "key": "ctrl+shift+p",
-        "mac": "cmd+shift+p",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p",
         "when": "editorTextFocus"
       }
     ],

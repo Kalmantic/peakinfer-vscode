@@ -1,28 +1,16 @@
 <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="128" height="128" rx="16" fill="#1a1a2e"/>
+  <!-- Background with rounded corners and gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#11111b"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#bgGradient)"/>
 
-  <!-- Terminal window frame -->
-  <rect x="16" y="24" width="96" height="80" rx="8" fill="#2d2d44"/>
+  <!-- ">" chevron as path - centered -->
+  <path d="M28 38 L58 64 L28 90" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 
-  <!-- Terminal header dots -->
-  <circle cx="30" cy="36" r="4" fill="#ff5f56"/>
-  <circle cx="44" cy="36" r="4" fill="#ffbd2e"/>
-  <circle cx="58" cy="36" r="4" fill="#27ca40"/>
-
-  <!-- Terminal prompt line 1 -->
-  <rect x="24" y="52" width="8" height="3" fill="#ca8a04"/>
-  <rect x="36" y="52" width="48" height="3" fill="#6b7280"/>
-
-  <!-- Terminal prompt line 2 - PI text -->
-  <rect x="24" y="64" width="8" height="3" fill="#ca8a04"/>
-  <text x="36" y="68" font-family="monospace" font-size="14" font-weight="bold" fill="#ffffff">peakinfer</text>
-
-  <!-- Terminal prompt line 3 - analysis -->
-  <rect x="24" y="76" width="8" height="3" fill="#2d6a4f"/>
-  <rect x="36" y="76" width="56" height="3" fill="#2d6a4f"/>
-
-  <!-- Terminal prompt line 4 -->
-  <rect x="24" y="88" width="8" height="3" fill="#ca8a04"/>
-  <rect x="36" y="88" width="4" height="3" fill="#ffffff"/>
+  <!-- "_" underscore as path - centered -->
+  <rect x="68" y="82" width="32" height="8" rx="2" fill="#f59e0b"/>
 </svg>

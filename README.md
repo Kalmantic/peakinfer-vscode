@@ -53,7 +53,7 @@ export PEAKINFER_TOKEN=pk_your-token-here
 ### Analyze Current File
 
 - Command Palette: `PeakInfer: Analyze Current File`
-- Keyboard: Cmd+Shift+P (Mac) / Ctrl+Shift+P (Windows/Linux)
+- Keyboard: Cmd+Option+P (Mac) / Ctrl+Alt+P (Windows/Linux)
 - Right-click in editor: "PeakInfer: Analyze Current File"
 
 ### Analyze Workspace

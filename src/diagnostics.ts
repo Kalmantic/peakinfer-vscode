@@ -63,6 +63,19 @@ export class DiagnosticsManager {
   }
 
   /**
+   * Get all diagnostics across all files
+   */
+  getAllDiagnostics(): [vscode.Uri, readonly vscode.Diagnostic[]][] {
+    const result: [vscode.Uri, readonly vscode.Diagnostic[]][] = [];
+    this.diagnosticCollection.forEach((uri, diagnostics) => {
+      if (diagnostics.length > 0) {
+        result.push([uri, diagnostics]);
+      }
+    });
+    return result;
+  }
+
+  /**
    * Create diagnostics from analysis result
    */
   private createDiagnostics(result: AnalysisResult): vscode.Diagnostic[] {
