@@ -104,6 +104,18 @@
         "title": "Getting Started",
         "category": "PeakInfer",
         "icon": "$(book)"
+      },
+      {
+        "command": "peakinfer.applyQuickFix",
+        "title": "Apply Quick Fix",
+        "category": "PeakInfer",
+        "icon": "$(lightbulb)"
+      },
+      {
+        "command": "peakinfer.showIssueDetails",
+        "title": "Show Issue Details",
+        "category": "PeakInfer",
+        "icon": "$(info)"
       }
     ],
     "configuration": {
@@ -144,6 +156,11 @@
             "**/*.spec.*"
           ],
           "description": "Glob patterns for files to exclude from analysis"
+        },
+        "peakinfer.autoDetect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect and notify when opening files with LLM inference code"
         }
       }
     },

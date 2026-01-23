@@ -1,13 +1,15 @@
 /**
  * Command Registration
  *
- * Registers VS Code commands for PeakInfer
+ * Registers VS Code commands for PeakInfer with enhanced progress tracking
+ * and view integration for AI-native UX.
  */
 
 import * as vscode from 'vscode';
 import { DiagnosticsManager } from './diagnostics';
 import { AnalysisRunner } from './analysis';
 import { ResultsPanel } from './views/resultsPanel';
+import { updateViewsWithResults } from './extension';
 
 /**
  * Register all PeakInfer commands
@@ -39,11 +41,7 @@ export function registerCommands(
         return;
       }
 
-      await analyzeWorkspace(
-        workspaceFolders[0].uri,
-        diagnosticsManager,
-        analysisRunner
-      );
+      await analyzeWorkspace(workspaceFolders[0].uri, diagnosticsManager, analysisRunner);
     })
   );
 
@@ -80,11 +78,7 @@ export function registerCommands(
 
       if (token) {
         const config = vscode.workspace.getConfiguration('peakinfer');
-        await config.update(
-          'token',
-          token,
-          vscode.ConfigurationTarget.Global
-        );
+        await config.update('token', token, vscode.ConfigurationTarget.Global);
         vscode.window.showInformationMessage('PeakInfer token saved');
       }
     })
@@ -92,7 +86,7 @@ export function registerCommands(
 }
 
 /**
- * Analyze a single file
+ * Analyze a single file with enhanced progress feedback
  */
 export async function analyzeFile(
   uri: vscode.Uri,
@@ -100,6 +94,10 @@ export async function analyzeFile(
   analysisRunner: AnalysisRunner
 ): Promise<void> {
   const fileName = uri.fsPath.split('/').pop() || uri.fsPath;
+
+  // Show results panel with loading state
+  ResultsPanel.show(vscode.Uri.file(''));
+  ResultsPanel.showLoading();
 
   await vscode.window.withProgress(
     {
@@ -109,15 +107,34 @@ export async function analyzeFile(
     },
     async (progress) => {
       try {
+        // Update progress stages
         progress.report({ message: 'Scanning for inference points...' });
+        ResultsPanel.updateProgress('scan', fileName);
 
+        // Small delay to show progress visually
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        ResultsPanel.updateProgress('detect');
+
+        progress.report({ message: 'Detecting patterns...' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        ResultsPanel.updateProgress('analyze');
+
+        // Run actual analysis
         const result = await analysisRunner.analyzeFile(uri);
+
+        ResultsPanel.updateProgress('benchmark');
+        progress.report({ message: 'Comparing benchmarks...' });
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        ResultsPanel.updateProgress('generate');
+        progress.report({ message: 'Generating recommendations...' });
 
         if (result.inferencePoints.length === 0) {
           vscode.window.showInformationMessage(
             `PeakInfer: No inference points found in ${fileName}`
           );
           diagnosticsManager.clearFile(uri);
+          ResultsPanel.clearResults();
           return;
         }
 
@@ -130,6 +147,10 @@ export async function analyzeFile(
           message += ` with ${criticalIssues} critical and ${warnings} warnings`;
         }
 
+        // Update all views with results
+        ResultsPanel.updateResults([result]);
+        updateViewsWithResults([result]);
+
         if (criticalIssues > 0) {
           vscode.window.showWarningMessage(message, 'Show Results').then((action) => {
             if (action === 'Show Results') {
@@ -139,19 +160,15 @@ export async function analyzeFile(
         } else {
           vscode.window.showInformationMessage(message);
         }
-
-        // Update results panel if open
-        ResultsPanel.updateResults([result]);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+        // Show error in results panel
+        ResultsPanel.showError(errorMessage);
 
         if (errorMessage.includes('token') || errorMessage.includes('Token')) {
           vscode.window
-            .showErrorMessage(
-              `PeakInfer: ${errorMessage}`,
-              'Set Token'
-            )
+            .showErrorMessage(`PeakInfer: ${errorMessage}`, 'Set Token')
             .then((action) => {
               if (action === 'Set Token') {
                 vscode.commands.executeCommand('peakinfer.setToken');
@@ -166,13 +183,17 @@ export async function analyzeFile(
 }
 
 /**
- * Analyze entire workspace
+ * Analyze entire workspace with enhanced progress tracking
  */
 export async function analyzeWorkspace(
   rootUri: vscode.Uri,
   diagnosticsManager: DiagnosticsManager,
   analysisRunner: AnalysisRunner
 ): Promise<void> {
+  // Show results panel with loading state
+  ResultsPanel.show(vscode.Uri.file(''));
+  ResultsPanel.showLoading();
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -184,12 +205,38 @@ export async function analyzeWorkspace(
         // Clear existing diagnostics
         diagnosticsManager.clear();
 
-        const results = await analysisRunner.analyzeWorkspace(rootUri, progress);
+        // Update progress stages
+        progress.report({ message: 'Scanning files...' });
+        ResultsPanel.updateProgress('scan', 'Finding files...');
+
+        const results = await analysisRunner.analyzeWorkspace(rootUri, {
+          report: (update) => {
+            progress.report(update);
+            if (update.message?.includes('Collecting')) {
+              ResultsPanel.updateProgress('scan', update.message);
+            } else if (update.message?.includes('Analyzing')) {
+              ResultsPanel.updateProgress('analyze', update.message);
+            }
+          },
+        });
+
+        if (token.isCancellationRequested) {
+          ResultsPanel.clearResults();
+          return;
+        }
+
+        ResultsPanel.updateProgress('benchmark');
+        progress.report({ message: 'Comparing against benchmarks...' });
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        ResultsPanel.updateProgress('generate');
+        progress.report({ message: 'Generating recommendations...' });
 
         if (results.length === 0) {
           vscode.window.showInformationMessage(
             'PeakInfer: No inference points found in workspace'
           );
+          ResultsPanel.clearResults();
           return;
         }
 
@@ -212,30 +259,28 @@ export async function analyzeWorkspace(
           message += ` with ${totalCritical} critical and ${totalWarnings} warnings`;
         }
 
+        // Update all views with results
+        ResultsPanel.updateResults(results);
+        updateViewsWithResults(results);
+
         if (totalCritical > 0) {
-          vscode.window
-            .showWarningMessage(message, 'Show Results')
-            .then((action) => {
-              if (action === 'Show Results') {
-                vscode.commands.executeCommand('peakinfer.showResults');
-              }
-            });
+          vscode.window.showWarningMessage(message, 'Show Results').then((action) => {
+            if (action === 'Show Results') {
+              vscode.commands.executeCommand('peakinfer.showResults');
+            }
+          });
         } else {
           vscode.window.showInformationMessage(message);
         }
-
-        // Update results panel
-        ResultsPanel.updateResults(results);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+        // Show error in results panel
+        ResultsPanel.showError(errorMessage);
 
         if (errorMessage.includes('token') || errorMessage.includes('Token')) {
           vscode.window
-            .showErrorMessage(
-              `PeakInfer: ${errorMessage}`,
-              'Set Token'
-            )
+            .showErrorMessage(`PeakInfer: ${errorMessage}`, 'Set Token')
             .then((action) => {
               if (action === 'Set Token') {
                 vscode.commands.executeCommand('peakinfer.setToken');
